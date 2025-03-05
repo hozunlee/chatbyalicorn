@@ -16,10 +16,11 @@ datasource db {
 }
 
 model User {
-  id           String  @id @default(uuid())
+  id           Int     @id @default(autoincrement())
   email        String  @unique
   name         String?
   profileImage String?
+  session      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -38,10 +39,10 @@ model ChatRoom {
   socketRoomId  String   @unique @default(uuid())
 
   // 1:1 채팅의 두 참가자
-  user1Id String
-  user2Id String
-  user1   User   @relation("User1", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2   User   @relation("User2", fields: [user2Id], references: [id], onDelete: Cascade)
+  user1Id Int
+  user2Id Int
+  user1   User @relation("User1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2   User @relation("User2", fields: [user2Id], references: [id], onDelete: Cascade)
 
   // 각 사용자별 안 읽은 메시지 카운트
   user1UnreadCount Int @default(0)
@@ -58,12 +59,14 @@ model ChatRoom {
 }
 
 model Message {
-  id         String   @id @default(uuid())
-  content    String   @db.Text
+  id         String @id @default(uuid())
+  content    String @db.Text
   chatRoomId String
-  senderId   String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+
+  senderId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // 각 사용자별 읽음 상태
   isReadByUser1 Boolean   @default(false)

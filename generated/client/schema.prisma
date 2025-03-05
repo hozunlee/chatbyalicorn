@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_POOLING_URL") // uses connection pooling
+  directUrl = env("POSTGRES_DIRECT_URL") // uses a direct connection
+}
+
+model User {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  name         String?
+  profileImage String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 1:1 채팅 관계
+  chatRoomsAsUser1 ChatRoom[] @relation("User1")
+  chatRoomsAsUser2 ChatRoom[] @relation("User2")
+  sentMessages     Message[]
+}
+
+model ChatRoom {
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastMessageAt DateTime @default(now())
+  socketRoomId  String   @unique @default(uuid())
+
+  // 1:1 채팅의 두 참가자
+  user1Id String
+  user2Id String
+  user1   User   @relation("User1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2   User   @relation("User2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  // 각 사용자별 안 읽은 메시지 카운트
+  user1UnreadCount Int @default(0)
+  user2UnreadCount Int @default(0)
+
+  // 메시지 관계
+  messages Message[]
+
+  // 중복 채팅방 방지
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@index([lastMessageAt])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String   @db.Text
+  chatRoomId String
+  senderId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // 각 사용자별 읽음 상태
+  isReadByUser1 Boolean   @default(false)
+  isReadByUser2 Boolean   @default(false)
+  readByUser1At DateTime?
+  readByUser2At DateTime?
+
+  // 관계
+  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  sender   User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([chatRoomId])
+  @@index([senderId])
+  @@index([createdAt])
+}

@@ -124,7 +124,8 @@ export const validateSession = async (sessionId) => {
 		},
 		select: {
 			id: true,
-			name: true
+			name: true,
+			profileImage: true
 		}
 	})
 

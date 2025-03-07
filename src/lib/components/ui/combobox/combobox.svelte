@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	import Check from 'lucide-svelte/icons/check'
 	import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down'
 	import { tick } from 'svelte'
@@ -7,6 +7,7 @@
 	import { Button } from '$lib/components/ui/button/index.js'
 	import { cn } from '$lib/utils.js'
 	import * as Avatar from '$lib/components/ui/avatar/index.js'
+	import { socket } from '$lib/socket_client'
 	let { userList } = $props()
 	console.log('🚀 ~ userList:', userList)
 
@@ -20,11 +21,17 @@
 	// We want to refocus the trigger button when the user selects
 	// an item from the list so users can continue navigating the
 	// rest of the form with the keyboard.
-	function closeAndFocusTrigger(triggerId: string) {
+
+	/** @param {string} triggerId */
+	function closeAndFocusTrigger(triggerId) {
 		open = false
 		tick().then(() => {
 			document.getElementById(triggerId)?.focus()
 		})
+	}
+
+	const createOrJoinChatRoom = (targetUserId) => {
+		socket.createRoom(targetUserId)
 	}
 </script>
 
@@ -51,6 +58,7 @@
 						value={String(user.id)}
 						onSelect={(currentValue) => {
 							value = currentValue
+							createOrJoinChatRoom(Number(value))
 							closeAndFocusTrigger(ids.trigger)
 						}}
 					>

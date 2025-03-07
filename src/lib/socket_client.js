@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store'
 import { io } from 'socket.io-client'
+
 /**
  * @typedef {Object} SocketOptions
  * @property {boolean} [withCredentials=true] - CORS 인증 허용 여부. Default is `true`
@@ -16,7 +17,7 @@ import { io } from 'socket.io-client'
 class SocketWrapper {
 	/** @type {import('socket.io-client').Socket | null} */
 	#socket = null
-	#socketStore
+	// #socketStore
 	#isConnected // 연결 상태만 관리 (true/false)
 
 	// 싱글톤 인스턴스
@@ -28,7 +29,7 @@ class SocketWrapper {
 			return SocketWrapper.#instance
 		}
 
-		this.#socketStore = writable(null)
+		// this.#socketStore = writable(null)
 		this.#isConnected = writable(false)
 		SocketWrapper.#instance = this // 인스턴스를 저장
 	}
@@ -62,10 +63,10 @@ class SocketWrapper {
 				...options
 			})
 
-			this.#socketStore?.set(this.#socket)
+			// this.#socketStore?.set(this.#socket)
 
 			this.#socket.on('connection', () => {
-				console.log('Connected with ID:', this.#socket.id)
+				// console.log('Connected with ID:', this.#socket.id)
 				this.#isConnected?.set(true) // 연결 상태 업데이트
 			})
 
@@ -94,6 +95,22 @@ class SocketWrapper {
 	 */
 	emit(event, data) {
 		this.#socket?.emit(event, data)
+	}
+
+	/**
+	 * 채팅방을 생성하는 이벤트
+	 *
+	 * @param {string} targetUserId - 이벤트 이름
+	 */
+	createRoom(targetUserId) {
+		console.log('🚀 ~ SocketWrapper ~ createRoom ~ targetUserId:', targetUserId)
+		if (!targetUserId) {
+			return { status: 'fail', message: '대화 상대 ID가 필요합니다' }
+		}
+		// 채팅방 생성 요청 이벤트 발송
+		this.#socket?.emit('room_create', targetUserId)
+
+		this.#socket?.on('room_created', () => {})
 	}
 
 	/**

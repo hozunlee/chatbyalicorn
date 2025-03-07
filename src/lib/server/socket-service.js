@@ -1,6 +1,7 @@
 import { Server } from 'socket.io'
 import { createServer } from 'http'
 import { validateSession } from './auth/methods'
+import { prisma } from './index.js'
 
 /**
  * @typedef {Object} User
@@ -166,8 +167,51 @@ function setupSocketHandlers(io) {
 
 	// 연결 이벤트
 	io.on('connection', (socket) => {
-		const user = socket.data.user
-		console.log(`사용자 연결됨: ${user?.name || '알 수 없음'} (${socket.id})`)
+		const currentUser = socket.data.user
+		console.log(`사용자 연결됨: ${currentUser?.name || '알 수 없음'} (${socket.id})`)
+
+		// 채팅방 생성
+		socket.on('room_create', async (targetUserId, callback) => {
+			console.log('📟 채팅방 생성 요청: 연결할 userId', targetUserId)
+
+			// 이미 존재하는 채팅방 확인
+			const existingRoom = await prisma.chatRoom.findFirst({
+				where: {
+					OR: [
+						{ user1Id: currentUser.id, user2Id: targetUserId },
+						{ user1Id: targetUserId, user2Id: currentUser.id }
+					]
+				},
+				select: {
+					id: true,
+					createdAt: true
+				}
+			})
+			console.log('🚀 ~ socket.on ~ existingRoom:', existingRoom)
+
+			if (existingRoom) {
+				socket.join(existingRoom.id)
+				console.log('📟 기존 채팅방으로 연결합니다.')
+				socket.emit('room_created', existingRoom)
+				return
+			}
+
+			// 새 채팅방 생성
+			const room = await prisma.chatRoom.create({
+				data: {
+					user1Id: currentUser.id,
+					user2Id: targetUserId
+				}
+			})
+			socket.join(room.id)
+			console.log('📟 새로운 채팅방으로 연결합니다.')
+
+			// 생성된 방 정보 전송
+			socket.emit('room_created', {
+				id: room.id,
+				createdAt: room.createdAt
+			})
+		})
 
 		// 채팅방 입장
 		socket.on('join_room', (data) => {
@@ -183,7 +227,7 @@ function setupSocketHandlers(io) {
 
 			if (data.roomId) {
 				socket.to(data.roomId).emit('new_message', {
-					sender: user,
+					sender: currentUser.name,
 					content: data.content,
 					timestamp: new Date()
 				})

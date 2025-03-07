@@ -54,6 +54,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      cmdk-sv:
+        specifier: ^0.0.18
+        version: 0.0.18(svelte@5.22.2)
       eslint:
         specifier: ^9.18.0
         version: 9.21.0(jiti@2.4.2)
@@ -66,6 +69,9 @@ importers:
       globals:
         specifier: ^16.0.0
         version: 16.0.0
+      lucide-svelte:
+        specifier: ^0.477.0
+        version: 0.477.0(svelte@5.22.2)
       prettier:
         specifier: ^3.4.2
         version: 3.5.3
@@ -752,6 +758,11 @@ packages:
   binary-searching@2.0.5:
     resolution: {integrity: sha512-v4N2l3RxL+m4zDxyxz3Ne2aTmiPn8ZUpKFpdPtO+ItW1NcTCXA7JeHG5GMBSvoKSkQZ9ycS+EouDVxYB9ufKWA==}
 
+  bits-ui@0.21.16:
+    resolution: {integrity: sha512-XFZ7/bK7j/K+5iktxX/ZpmoFHjYjpPzP5EOO/4bWiaFg5TG1iMcfjDhlBTQnJxD6BoVoHuqeZPHZvaTgF4Iv3Q==}
+    peerDependencies:
+      svelte: ^4.0.0 || ^5.0.0-next.118
+
   bits-ui@0.22.0:
     resolution: {integrity: sha512-r7Fw1HNgA4YxZBRcozl7oP0bheQ8EHh+kfMBZJgyFISix8t4p/nqDcHLmBgIiJ3T5XjYnJRorYDjIWaCfhb5fw==}
     peerDependencies:
@@ -778,6 +789,11 @@ packages:
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
+
+  cmdk-sv@0.0.18:
+    resolution: {integrity: sha512-istixiQSy9Ez/mQ4VXWB69btqNyDZckbd1XFEwR46Vw+n5zjdmvoWAcOTj0uX3FZXtw9ikwLVmfoW2nwwMClRg==}
+    peerDependencies:
+      svelte: ^4.0.0 || ^5.0.0-next.1
 
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
@@ -1175,6 +1191,11 @@ packages:
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
+
+  lucide-svelte@0.477.0:
+    resolution: {integrity: sha512-w/zj6/CXTtTizIeo8SuWGYu0u45CJ7cD2AtNzIObVHZrWXNgaIIX/2cI25wybjSmYHIi4pub2TLv/kNPKiB3ww==}
+    peerDependencies:
+      svelte: ^3 || ^4 || ^5.0.0-next.42
 
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
@@ -2258,6 +2279,13 @@ snapshots:
 
   binary-searching@2.0.5: {}
 
+  bits-ui@0.21.16(svelte@5.22.2):
+    dependencies:
+      '@internationalized/date': 3.7.0
+      '@melt-ui/svelte': 0.76.2(svelte@5.22.2)
+      nanoid: 5.1.2
+      svelte: 5.22.2
+
   bits-ui@0.22.0(svelte@5.22.2):
     dependencies:
       '@internationalized/date': 3.7.0
@@ -2284,6 +2312,12 @@ snapshots:
       readdirp: 4.1.2
 
   clsx@2.1.1: {}
+
+  cmdk-sv@0.0.18(svelte@5.22.2):
+    dependencies:
+      bits-ui: 0.21.16(svelte@5.22.2)
+      nanoid: 5.1.2
+      svelte: 5.22.2
 
   color-convert@2.0.1:
     dependencies:
@@ -2678,6 +2712,10 @@ snapshots:
       p-locate: 5.0.0
 
   lodash.merge@4.6.2: {}
+
+  lucide-svelte@0.477.0(svelte@5.22.2):
+    dependencies:
+      svelte: 5.22.2
 
   magic-string@0.30.17:
     dependencies:

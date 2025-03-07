@@ -14,13 +14,14 @@ import { io } from 'socket.io-client'
  * @class
  */
 class SocketWrapper {
-	/** @type {import('socket.io-client').Socket} */
-	#socket
+	/** @type {import('socket.io-client').Socket | null} */
+	#socket = null
 	#socketStore
 	#isConnected // 연결 상태만 관리 (true/false)
 
 	// 싱글톤 인스턴스
-	static #instance
+	/** @type {SocketWrapper | null} */
+	static #instance = null
 
 	constructor() {
 		if (SocketWrapper.#instance) {

@@ -171,7 +171,7 @@ function setupSocketHandlers(io) {
 		console.log(`사용자 연결됨: ${currentUser?.name || '알 수 없음'} (${socket.id})`)
 
 		// 채팅방 생성
-		socket.on('join_room', async (targetUserId, callback) => {
+		socket.on('join_room', async (targetUserId) => {
 			console.log('📟 채팅방 연결 요청: 연결할 userId', targetUserId)
 
 			// 이미 존재하는 채팅방 확인

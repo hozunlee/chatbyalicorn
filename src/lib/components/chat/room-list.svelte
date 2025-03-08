@@ -4,8 +4,10 @@
 	import { cn } from '$lib/utils.js'
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js'
 	import * as Avatar from '$lib/components/ui/avatar/index.js'
+	import { socket } from '$lib/socket_client'
 
 	let { items } = $props()
+	console.log('🚀 ~ items:', items)
 </script>
 
 <ScrollArea class="h-screen">
@@ -13,6 +15,7 @@
 		{#each items as item}
 			<!-- 채팅방 연결 on:click 추가 -->
 			<button
+				onclick={() => socket.join(Number(item.userId))}
 				class={cn(
 					'hover:bg-accent flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all'
 					// $mailStore.selected === item.id && "bg-muted"

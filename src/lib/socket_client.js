@@ -101,7 +101,7 @@ class SocketWrapper {
 	/**
 	 * 채팅방을 참여하는 메서드 하지만 채팅방이 없으면 채팅방을 생성요청한다. 기존 채팅방이 있으면, 기존 채팅방 ID를 전달해준다.
 	 *
-	 * @param {string} targetUserId - 이벤트 이름
+	 * @param {Number} targetUserId - 상대 유저 ID
 	 */
 	join(targetUserId) {
 		console.log('🚀 ~ SocketWrapper ~ createRoom ~ targetUserId:', targetUserId)

@@ -70,6 +70,7 @@ export async function load({ locals }) {
 
 			return {
 				id: room.id,
+				userId: otherUser.id,
 				name: otherUser.name,
 				profileImage: otherUser.profileImage,
 				lastMessage: room.messages[0] || null,

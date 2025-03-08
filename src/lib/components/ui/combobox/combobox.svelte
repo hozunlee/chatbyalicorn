@@ -29,11 +29,6 @@
 			document.getElementById(triggerId)?.focus()
 		})
 	}
-
-	/** @param targetUserId {String} 대화 상대 userId */
-	const createOrJoinChatRoom = (targetUserId) => {
-		socket.join(targetUserId)
-	}
 </script>
 
 <Popover.Root bind:open let:ids>
@@ -59,7 +54,7 @@
 						value={String(user.id)}
 						onSelect={(currentValue) => {
 							value = currentValue
-							createOrJoinChatRoom(Number(value))
+							socket.join(Number(currentValue))
 							closeAndFocusTrigger(ids.trigger)
 						}}
 					>

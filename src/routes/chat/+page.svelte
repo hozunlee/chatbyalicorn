@@ -1,6 +1,7 @@
 <script>
 	import { Button } from '$lib/components/ui/button'
 	import Combobox from '$lib/components/ui/combobox/combobox.svelte'
+	import Chat from './Chat.svelte'
 
 	let { data } = $props()
 
@@ -19,6 +20,5 @@
 		{/if}
 	</section>
 
-	<div>채팅목록</div>
-	<div>채팅방</div>
+	<Chat rooms={data.roomList} />
 </div>

@@ -64,22 +64,23 @@ export async function load({ locals }) {
 		})
 
 		// 채팅방 데이터 가공
-		const formattedRooms = chatRooms.map((room) => {
+		const roomList = chatRooms.map((room) => {
 			// 현재 사용자 기준으로 상대방 정보 결정
 			const otherUser = room.user1Id === currentUser.id ? room.user2 : room.user1
 
 			return {
 				id: room.id,
-				otherUser,
+				name: otherUser.name,
+				profileImage: otherUser.profileImage,
 				lastMessage: room.messages[0] || null,
 				updatedAt: room.updatedAt,
 				unreadCount: 0 // 추후에 구현
 			}
 		})
-		console.log('🚀 ~ load ~ formattedRooms:', currentUser.id, formattedRooms)
 
 		return {
-			userList
+			userList,
+			roomList
 		}
 	} catch (error) {
 		console.error('사용자 목록 로드 오류:', error)

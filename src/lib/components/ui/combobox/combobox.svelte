@@ -30,8 +30,9 @@
 		})
 	}
 
+	/** @param targetUserId {String} 대화 상대 userId */
 	const createOrJoinChatRoom = (targetUserId) => {
-		socket.createRoom(targetUserId)
+		socket.join(targetUserId)
 	}
 </script>
 

@@ -1,18 +1,23 @@
 <script>
 	import Search from 'lucide-svelte/icons/search'
 
-	// import MailDisplay from "./mail-display.svelte";
 	import RoomList from '$lib/components/chat/room-list.svelte'
 	import { Input } from '$lib/components/ui/input/index.js'
 	import * as Resizable from '$lib/components/ui/resizable/index.js'
 	import { Separator } from '$lib/components/ui/separator'
 	import * as Tabs from '$lib/components/ui/tabs/index.js'
+	import ChatDisplay from '$lib/components/chat/chat-display.svelte'
+
+	import { selectedChatRoom } from '$lib/store.js'
 
 	let { rooms } = $props()
 	console.log('🚀 ~ rooms:', rooms)
 
+	$effect(() => console.log('🚀 ~ selectedChatRoom:', $selectedChatRoom))
+
 	let defaultLayout = [265, 440, 655]
 
+	/** @param sizes {string} */
 	function onLayoutChange(sizes) {
 		document.cookie = `PaneForge:layout=${JSON.stringify(sizes)}`
 	}
@@ -58,8 +63,8 @@
 			</Tabs.Root>
 		</Resizable.Pane>
 		<Resizable.Handle withHandle />
-		<!-- <Resizable.Pane defaultSize={defaultLayout[2]}>
-			<MailDisplay mail={chats.find((item) => item.id === $chats.selected) || null} />
-		</Resizable.Pane> -->
+		<Resizable.Pane defaultSize={defaultLayout[2]}>
+			<ChatDisplay chats={null} />
+		</Resizable.Pane>
 	</Resizable.PaneGroup>
 </div>

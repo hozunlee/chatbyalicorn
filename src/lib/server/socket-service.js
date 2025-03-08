@@ -171,8 +171,8 @@ function setupSocketHandlers(io) {
 		console.log(`사용자 연결됨: ${currentUser?.name || '알 수 없음'} (${socket.id})`)
 
 		// 채팅방 생성
-		socket.on('room_create', async (targetUserId, callback) => {
-			console.log('📟 채팅방 생성 요청: 연결할 userId', targetUserId)
+		socket.on('join_room', async (targetUserId, callback) => {
+			console.log('📟 채팅방 연결 요청: 연결할 userId', targetUserId)
 
 			// 이미 존재하는 채팅방 확인
 			const existingRoom = await prisma.chatRoom.findFirst({
@@ -182,17 +182,42 @@ function setupSocketHandlers(io) {
 						{ user1Id: targetUserId, user2Id: currentUser.id }
 					]
 				},
-				select: {
-					id: true,
-					createdAt: true
+				include: {
+					// user1 정보 포함
+					user1: {
+						select: {
+							id: true,
+							name: true,
+							profileImage: true
+						}
+					},
+					// user2 정보 포함
+					user2: {
+						select: {
+							id: true,
+							name: true,
+							profileImage: true
+						}
+					}
 				}
 			})
-			console.log('🚀 ~ socket.on ~ existingRoom:', existingRoom)
-
 			if (existingRoom) {
+				// 상대방 정보 결정 (user1이 현재 사용자면 user2가 상대방, 반대의 경우 user1이 상대방)
+				const partner =
+					existingRoom.user1Id === currentUser.id ? existingRoom.user2 : existingRoom.user1
+
 				socket.join(existingRoom.id)
 				console.log('📟 기존 채팅방으로 연결합니다.')
-				socket.emit('room_created', existingRoom)
+
+				socket.emit('room_joined', {
+					id: existingRoom.id,
+					createdAt: existingRoom.createdAt,
+					partner: {
+						id: partner.id,
+						name: partner.name,
+						profileImage: partner.profileImage
+					}
+				})
 				return
 			}
 
@@ -207,18 +232,10 @@ function setupSocketHandlers(io) {
 			console.log('📟 새로운 채팅방으로 연결합니다.')
 
 			// 생성된 방 정보 전송
-			socket.emit('room_created', {
+			socket.emit('room_joined', {
 				id: room.id,
 				createdAt: room.createdAt
 			})
-		})
-
-		// 채팅방 입장
-		socket.on('join_room', (data) => {
-			if (data.roomId) {
-				socket.join(data.roomId)
-				socket.emit('room_joined', { roomId: data.roomId })
-			}
 		})
 
 		// 메시지 전송

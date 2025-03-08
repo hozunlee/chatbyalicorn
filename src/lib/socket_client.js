@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store'
+import { selectedChatRoom } from './store'
 import { io } from 'socket.io-client'
 
 /**
@@ -98,19 +99,22 @@ class SocketWrapper {
 	}
 
 	/**
-	 * 채팅방을 생성하는 이벤트
+	 * 채팅방을 참여하는 메서드 하지만 채팅방이 없으면 채팅방을 생성요청한다. 기존 채팅방이 있으면, 기존 채팅방 ID를 전달해준다.
 	 *
 	 * @param {string} targetUserId - 이벤트 이름
 	 */
-	createRoom(targetUserId) {
+	join(targetUserId) {
 		console.log('🚀 ~ SocketWrapper ~ createRoom ~ targetUserId:', targetUserId)
 		if (!targetUserId) {
 			return { status: 'fail', message: '대화 상대 ID가 필요합니다' }
 		}
-		// 채팅방 생성 요청 이벤트 발송
-		this.#socket?.emit('room_create', targetUserId)
+		// 채팅방 참여 요청 이벤트 전송
+		this.#socket?.emit('join_room', targetUserId)
 
-		this.#socket?.on('room_created', () => {})
+		this.#socket?.on('room_joined', (roomInfo) => {
+			console.log('🚀 ~ SocketWrapper ~ this.#socket?.on ~ roomInfo:', roomInfo)
+			selectedChatRoom.set(roomInfo)
+		})
 	}
 
 	/**

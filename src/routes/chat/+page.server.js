@@ -70,9 +70,11 @@ export async function load({ locals }) {
 
 			return {
 				id: room.id,
-				userId: otherUser.id,
-				name: otherUser.name,
-				profileImage: otherUser.profileImage,
+				partner: {
+					id: otherUser.id,
+					name: otherUser.name,
+					profileImage: otherUser.profileImage
+				},
 				lastMessage: room.messages[0] || null,
 				updatedAt: room.updatedAt,
 				unreadCount: 0 // 추후에 구현

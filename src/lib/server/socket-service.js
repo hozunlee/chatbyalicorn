@@ -201,12 +201,13 @@ function setupSocketHandlers(io) {
 					}
 				}
 			})
+
 			if (existingRoom) {
 				// 상대방 정보 결정 (user1이 현재 사용자면 user2가 상대방, 반대의 경우 user1이 상대방)
 				const partner =
 					existingRoom.user1Id === currentUser.id ? existingRoom.user2 : existingRoom.user1
 
-				socket.join(existingRoom.id)
+				// socket.join(existingRoom.id)
 				console.log('📟 기존 채팅방으로 연결합니다.')
 
 				socket.emit('room_joined', {
@@ -226,15 +227,24 @@ function setupSocketHandlers(io) {
 				data: {
 					user1Id: currentUser.id,
 					user2Id: targetUserId
+				},
+				include: {
+					user2: {
+						select: {
+							id: true,
+							name: true,
+							profileImage: true
+						}
+					}
 				}
 			})
-			socket.join(room.id)
 			console.log('📟 새로운 채팅방으로 연결합니다.')
 
 			// 생성된 방 정보 전송
 			socket.emit('room_joined', {
 				id: room.id,
-				createdAt: room.createdAt
+				createdAt: room.createdAt,
+				partner: room.user2
 			})
 		})
 

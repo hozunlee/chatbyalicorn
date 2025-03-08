@@ -8,16 +8,12 @@
 	import { cn } from '$lib/utils.js'
 	import * as Avatar from '$lib/components/ui/avatar/index.js'
 	import { socket } from '$lib/socket_client'
+
 	let { userList } = $props()
-	console.log('🚀 ~ userList:', userList)
 
 	let open = $state(false)
 	let value = $state('')
-	let selectedValue = $state('')
 
-	$effect(() => {
-		selectedValue = userList.find((f) => String(f.value) === value)?.label ?? '대화상대 초대'
-	})
 	// We want to refocus the trigger button when the user selects
 	// an item from the list so users can continue navigating the
 	// rest of the form with the keyboard.
@@ -40,7 +36,6 @@
 			aria-expanded={open}
 			class="w-[200px] justify-between"
 		>
-			{selectedValue}
 			<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
 		</Button>
 	</Popover.Trigger>

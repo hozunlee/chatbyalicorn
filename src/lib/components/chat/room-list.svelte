@@ -34,7 +34,7 @@
 								// $mailStore.selected === item.id ? 'text-foreground' : 'text-muted-foreground'
 							)}
 						>
-							{formatTimeAgo(new Date(item.updatedAt))}
+							{formatTimeAgo(new Date(item.lastMessage.createdAt))}
 						</div>
 					</div>
 					<!-- <div class="text-xs font-medium">{item.subject}</div> -->

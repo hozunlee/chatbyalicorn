@@ -22,7 +22,6 @@
 	let isNewChat = $state(false)
 	let isConnected = $state(false)
 	let roomList = $state(rooms)
-	console.log('🚀 ~ roomList:', $state.snapshot(roomList))
 
 	let selectedRoomInfo = $state([])
 
@@ -42,17 +41,44 @@
 			})
 
 			// newMessage를 받게 되면 해당 방의 room lastMessage update
-			socket.on('new_message', (roomData) => {
-				if (dev) console.log('update_room_last', roomData)
+			socket.on('new_message', (newMsg) => {
+				if (dev) console.log('update_room_last', newMsg)
 
 				//FIXME : roomList의 lastMessage 업데이트
+				// 메시지가 속한 채팅방 업데이트
+				updateRoomWithMessage(newMsg)
 			})
 
 			return () => messageUnsubscribe()
 		}
 	})
 
-	// }
+	const updateRoomWithMessage = (message) => {
+		// 메시지에 필요한 정보가 있는지 확인
+		if (!message || !message.roomId) return
+
+		const roomId = message.roomId
+		const roomIndex = roomList.findIndex((room) => room.id === roomId)
+
+		if (roomIndex >= 0) {
+			// 기존 방이면 메시지 정보 업데이트 및 목록 맨 위로 이동
+			const updatedRoom = {
+				...roomList[roomIndex],
+				lastMessage: {
+					id: message.id,
+					content: message.content,
+					createdAt: message.createdAt,
+					senderId: message.senderId
+				}
+			}
+
+			// 해당 방을 제외한 나머지 방들
+			const otherRooms = roomList.filter((room) => room.id !== roomId)
+
+			// 업데이트된 방을 맨 위로 이동
+			roomList = [updatedRoom, ...otherRooms]
+		}
+	}
 
 	let defaultLayout = [265, 440, 655]
 

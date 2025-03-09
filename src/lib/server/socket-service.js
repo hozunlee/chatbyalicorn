@@ -266,8 +266,6 @@ function setupSocketHandlers(io) {
 
 		// 메시지 전송
 		socket.on('send_message', async (data) => {
-			console.log('메시지 수신:', data)
-
 			const savedMessage = await sendMessage(userId, data.roomId, data.content)
 
 			if (savedMessage.id) {
@@ -282,7 +280,12 @@ function setupSocketHandlers(io) {
 	})
 }
 
-// 메시지 전송
+/**
+ * @param {number} userId
+ * @param {string} roomId
+ * @param {string} content
+ * @returns
+ */
 async function sendMessage(userId, roomId, content) {
 	// 채팅방 정보 조회
 	const room = await prisma.chatRoom.findUnique({ where: { id: roomId } })
@@ -330,4 +333,63 @@ async function sendMessage(userId, roomId, content) {
 	}
 
 	return savedMessage
+}
+
+const roomInfoUpdate = async (params) => {
+	// 채팅방 목록 조회
+	const chatRooms = await prisma.chatRoom.findMany({
+		where: {
+			OR: [{ user1Id: currentUser.id }, { user2Id: currentUser.id }]
+		},
+		include: {
+			user1: {
+				select: {
+					id: true,
+					name: true,
+					profileImage: true
+				}
+			},
+			user2: {
+				select: {
+					id: true,
+					name: true,
+					profileImage: true
+				}
+			},
+			// 최근 메시지 조회
+			messages: {
+				orderBy: { createdAt: 'desc' },
+				take: 1,
+				select: {
+					id: true,
+					content: true,
+					createdAt: true,
+					senderId: true
+				}
+			}
+		},
+		orderBy: {
+			updatedAt: 'desc' // 최근 업데이트된 채팅방 순
+		}
+	})
+
+	// 채팅방 데이터 가공
+	const roomList = chatRooms.map((room) => {
+		// 현재 사용자 기준으로 상대방 정보 결정
+		const otherUser = room.user1Id === currentUser.id ? room.user2 : room.user1
+
+		return {
+			id: room.id,
+			partner: {
+				id: otherUser.id,
+				name: otherUser.name,
+				profileImage: otherUser.profileImage
+			},
+			lastMessage: room.messages[0] || null,
+			updatedAt: room.updatedAt,
+			unreadCount: 0 // 추후에 구현
+		}
+	})
+
+	return roomList
 }

@@ -131,3 +131,19 @@ export const validateSession = async (sessionId) => {
 
 	return user
 }
+
+export const resetSession = async (userId) => {
+	const resetSession = await prisma.user.update({
+		where: {
+			id: userId
+		},
+		data: {
+			session: ''
+		},
+		select: {
+			session: true
+		}
+	})
+
+	return resetSession ?? false
+}

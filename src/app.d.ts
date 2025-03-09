@@ -6,7 +6,7 @@ declare global {
 	var prisma: PrismaClient
 	namespace App {
 		interface Locals {
-			user: { id: number; name: string | null }
+			user: { id: number; name: string | null } | undefined
 		}
 		// interface Error {}
 		// interface Platform {}

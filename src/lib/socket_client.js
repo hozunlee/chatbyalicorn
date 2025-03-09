@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store'
 import { selectedChatRoom } from './store'
 import { io } from 'socket.io-client'
+import { connectedSocket } from './store.js'
 
 /**
  * @typedef {Object} SocketOptions
@@ -66,9 +67,10 @@ class SocketWrapper {
 
 			// this.#socketStore?.set(this.#socket)
 
-			this.#socket.on('connection', () => {
-				// console.log('Connected with ID:', this.#socket.id)
+			this.#socket.on('connect', () => {
+				console.log('Connected with ID:', this.#socket.id)
 				this.#isConnected?.set(true) // 연결 상태 업데이트
+				connectedSocket.set(true)
 			})
 
 			this.#socket.on('disconnect', () => {
@@ -89,16 +91,6 @@ class SocketWrapper {
 	}
 
 	/**
-	 * 이벤트를 서버로 전송합니다
-	 *
-	 * @param {string} event - 이벤트 이름
-	 * @param {any} data - 전송할 데이터
-	 */
-	emit(event, data) {
-		this.#socket?.emit(event, data)
-	}
-
-	/**
 	 * 채팅방을 참여하는 메서드 하지만 채팅방이 없으면 채팅방을 생성요청한다. 기존 채팅방이 있으면, 기존 채팅방 ID를 전달해준다.
 	 *
 	 * @param {Number} targetUserId - 상대 유저 ID
@@ -115,6 +107,17 @@ class SocketWrapper {
 			console.log('🚀 ~ SocketWrapper ~ this.#socket?.on ~ roomInfo:', roomInfo)
 			selectedChatRoom.set(roomInfo)
 		})
+	}
+
+	/**
+	 * 이벤트를 서버로 전송합니다
+	 *
+	 * @param {string} event - 이벤트 이름
+	 * @param {any} data - 전송할 데이터
+	 * @param {() => void} callback - 콜백 함수
+	 */
+	emit(event, data, callback) {
+		this.#socket?.emit(event, data, callback)
 	}
 
 	/**

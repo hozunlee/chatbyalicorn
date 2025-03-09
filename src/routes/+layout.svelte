@@ -1,6 +1,7 @@
 <script>
+	import { userName } from './../lib/store.js'
 	import '../app.css'
-	let { children } = $props()
+	let { children, data } = $props()
 
 	import { onMount } from 'svelte'
 	import { socket } from '$lib/socket_client.js'
@@ -17,6 +18,12 @@
 		})
 		return () => {
 			socket.disconnect()
+		}
+	})
+
+	$effect(() => {
+		if (data.userName) {
+			userName.set(data.userName)
 		}
 	})
 </script>

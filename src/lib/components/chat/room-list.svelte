@@ -1,13 +1,30 @@
 <script>
 	import AvatarLogo from '$lib/components/ui/avatar/AvatarLogo.svelte'
-	// import { mailStore } from '../store.js'
 	import { formatTimeAgo } from '$lib/utils.js'
 	import { cn } from '$lib/utils.js'
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js'
 	import { socket } from '$lib/socket_client'
+	import { onMount } from 'svelte'
 
 	let { items } = $props()
-	console.log('🚀 ~ items:', items)
+
+	onMount(() => {
+		if (socket.isConnected) {
+			socket.on('채팅방 실시간', () => {
+				console.log('채팅방 실시간')
+			})
+		}
+		return () => {
+			// socket.off('new_message', handleNewMessage)
+		}
+	})
+
+	$effect(() => {
+		if (socket.isConnected) {
+			console.log('hello')
+			socket.emit('채팅방 목록 요청')
+		}
+	})
 </script>
 
 <ScrollArea class="h-screen">
@@ -42,7 +59,7 @@
 					<!-- <div class="text-xs font-medium">{item.subject}</div> -->
 				</div>
 				<div class="text-muted-foreground line-clamp-2 text-xs">
-					{item.lastMessage ? item.lastMessage.substring(0, 300) : 'No messages yet'}
+					{item.lastMessage ? item.lastMessage.content.substring(0, 10) : 'No messages yet'}
 				</div>
 			</button>
 		{/each}

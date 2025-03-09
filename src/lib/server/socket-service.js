@@ -167,10 +167,11 @@ function setupSocketHandlers(io) {
 
 	// 연결 이벤트
 	io.on('connection', (socket) => {
-		const currentUser = socket.data.user
-		console.log(`사용자 연결됨: ${currentUser?.name || '알 수 없음'} (${socket.id})`)
+		const { id: userId, name: userName } = socket.data.user
+		console.log(`사용자 연결됨: ${userName || '알 수 없음'} (${socket.id})`)
 
-		// 채팅방 생성
+		// 채팅방 연결
+		// 채팅방이 있을 시 기존 채팅방으로 연결, 없을 시 새로운 채팅방 생성
 		socket.on('join_room', async (targetUserId) => {
 			console.log('📟 채팅방 연결 요청: 연결할 userId', targetUserId)
 
@@ -178,8 +179,8 @@ function setupSocketHandlers(io) {
 			const existingRoom = await prisma.chatRoom.findFirst({
 				where: {
 					OR: [
-						{ user1Id: currentUser.id, user2Id: targetUserId },
-						{ user1Id: targetUserId, user2Id: currentUser.id }
+						{ user1Id: userId, user2Id: targetUserId },
+						{ user1Id: targetUserId, user2Id: userId }
 					]
 				},
 				include: {
@@ -198,16 +199,28 @@ function setupSocketHandlers(io) {
 							name: true,
 							profileImage: true
 						}
+					},
+					// 최근 메시지 조회
+					messages: {
+						orderBy: { createdAt: 'desc' },
+						select: {
+							id: true,
+							content: true,
+							createdAt: true,
+							senderId: true
+						}
 					}
 				}
 			})
 
 			if (existingRoom) {
 				// 상대방 정보 결정 (user1이 현재 사용자면 user2가 상대방, 반대의 경우 user1이 상대방)
-				const partner =
-					existingRoom.user1Id === currentUser.id ? existingRoom.user2 : existingRoom.user1
+				const partner = existingRoom.user1Id === userId ? existingRoom.user2 : existingRoom.user1
 
-				// socket.join(existingRoom.id)
+				const messages = existingRoom.messages.map((message) => ({
+					...message,
+					isMyMessage: message.senderId === userId
+				}))
 				console.log('📟 기존 채팅방으로 연결합니다.')
 
 				socket.emit('room_joined', {
@@ -217,15 +230,17 @@ function setupSocketHandlers(io) {
 						id: partner.id,
 						name: partner.name,
 						profileImage: partner.profileImage
-					}
+					},
+					messages: messages
 				})
+				socket.join(existingRoom.id)
 				return
 			}
 
 			// 새 채팅방 생성
 			const room = await prisma.chatRoom.create({
 				data: {
-					user1Id: currentUser.id,
+					user1Id: userId,
 					user2Id: targetUserId
 				},
 				include: {
@@ -244,20 +259,20 @@ function setupSocketHandlers(io) {
 			socket.emit('room_joined', {
 				id: room.id,
 				createdAt: room.createdAt,
-				partner: room.user2
+				partner: room.user2,
+				messages: []
 			})
 		})
 
 		// 메시지 전송
-		socket.on('send_message', (data) => {
+		socket.on('send_message', async (data) => {
 			console.log('메시지 수신:', data)
 
-			if (data.roomId) {
-				socket.to(data.roomId).emit('new_message', {
-					sender: currentUser.name,
-					content: data.content,
-					timestamp: new Date()
-				})
+			const sentMessage = await sendMessage(userId, data.roomId, userId, data.content)
+			console.log('🚀 ~ socket.on ~ sentMessage:', sentMessage)
+
+			if (sentMessage.id) {
+				socket.to(data.roomId).emit('new_message', sentMessage)
 			}
 		})
 
@@ -266,4 +281,50 @@ function setupSocketHandlers(io) {
 			console.log(`사용자 연결 해제: ${socket.id}`)
 		})
 	})
+}
+
+// 메시지 전송
+async function sendMessage(userId, roomId, senderId, content) {
+	// 채팅방 정보 조회
+	const room = await prisma.chatRoom.findUnique({ where: { id: roomId } })
+
+	if (!room) {
+		throw new Error('채팅방을 찾을 수 없습니다')
+	}
+	// 수신자 ID 결정
+	const recipientId = room.user1Id === senderId ? room.user2Id : room.user1Id
+
+	// 메시지 생성
+	const message = await prisma.message.create({
+		data: {
+			chatRoomId: roomId,
+			senderId,
+			content,
+			readStatus: 'SENT',
+			// 메시지는 수신자 기준으로만 읽음 상태 관리
+			readByRecipient: false
+		},
+		select: {
+			id: true,
+			content: true,
+			createdAt: true,
+			senderId: true
+		}
+	})
+
+	// 채팅방 안 읽은 메시지 수 업데이트
+	await prisma.chatRoom.update({
+		where: { id: roomId },
+		data: {
+			lastMessageAt: new Date(),
+			// 수신자의 안 읽은 메시지 수만 증가
+			...(room.user1Id === recipientId
+				? { user1UnreadCount: { increment: 1 } }
+				: { user2UnreadCount: { increment: 1 } })
+		}
+	})
+
+	// isMyMessage 추가
+	const savedMessage = { ...message, isMyMessage: message.senderId === userId }
+	return savedMessage
 }

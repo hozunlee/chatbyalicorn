@@ -6,8 +6,8 @@
 	import * as Popover from '$lib/components/ui/popover/index.js'
 	import { Button } from '$lib/components/ui/button/index.js'
 	import { cn } from '$lib/utils.js'
-	import * as Avatar from '$lib/components/ui/avatar/index.js'
 	import { socket } from '$lib/socket_client'
+	import AvatarLogo from '../avatar/AvatarLogo.svelte'
 
 	let { userList } = $props()
 
@@ -53,10 +53,7 @@
 							closeAndFocusTrigger(ids.trigger)
 						}}
 					>
-						<Avatar.Root>
-							<Avatar.Image src={user.profileImage} alt={`${user.name} img`} />
-							<Avatar.Fallback>AC</Avatar.Fallback>
-						</Avatar.Root>
+						<AvatarLogo item={user} />
 						<Check class={cn('mr-2 h-4 w-4', value !== String(user.id) && 'text-transparent')} />
 						{user.name}
 					</Command.Item>

@@ -1,7 +1,7 @@
 import { derived, writable } from 'svelte/store'
 
 // 채팅방 전체 목록
-export const chatRoomList = writable([])
+export const connectedSocket = writable(false) // 현재 연결된 소켓
 
 // 현재 선택된 채팅방
 
@@ -28,10 +28,7 @@ export const chatRoomList = writable([])
 /* @type {SelectedRoomInfo} | null */
 export const selectedChatRoom = writable({})
 
-// 선택된 채팅방 정보 (derived 스토어)
-export const selectedRoom = derived(
-	[chatRoomList, selectedChatRoom],
-	([$chatRoomList, $selectedChatRoom]) => {
-		return $chatRoomList.find((room) => room.id === $selectedChatRoom) || null
-	}
-)
+export const partner = derived(selectedChatRoom, ($room) => $room?.partner || null)
+export const chatList = derived(selectedChatRoom, ($room) => $room?.messages || [])
+
+export const userName = writable('')

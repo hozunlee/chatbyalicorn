@@ -9,7 +9,7 @@
 	import { socket } from '$lib/socket_client'
 	import AvatarLogo from '../avatar/AvatarLogo.svelte'
 
-	let { userList } = $props()
+	let { userList, onSelect } = $props()
 
 	let open = $state(false)
 	let value = $state('')
@@ -42,23 +42,26 @@
 	<Popover.Content class="w-[200px] p-0">
 		<Command.Root>
 			<Command.Input placeholder="대화상대 초대" />
-			<Command.Empty>유저 이름을 찾을 수 없어요.</Command.Empty>
-			<Command.Group>
-				{#each userList as user}
-					<Command.Item
-						value={String(user.id)}
-						onSelect={(currentValue) => {
-							value = currentValue
-							socket.join(Number(currentValue))
-							closeAndFocusTrigger(ids.trigger)
-						}}
-					>
-						<AvatarLogo item={user} />
-						<Check class={cn('mr-2 h-4 w-4', value !== String(user.id) && 'text-transparent')} />
-						{user.name}
-					</Command.Item>
-				{/each}
-			</Command.Group>
+			<Command.List>
+				<Command.Empty>유저 이름을 찾을 수 없어요.</Command.Empty>
+				<Command.Group>
+					{#each userList as user}
+						<Command.Item
+							value={String(user.id)}
+							onSelect={(currentValue) => {
+								value = currentValue
+								socket.join(Number(currentValue))
+								onSelect()
+								closeAndFocusTrigger(ids.trigger)
+							}}
+						>
+							<AvatarLogo item={user} />
+							<Check class={cn('mr-2 h-4 w-4', value !== String(user.id) && 'text-transparent')} />
+							{user.name}
+						</Command.Item>
+					{/each}
+				</Command.Group>
+			</Command.List>
 		</Command.Root>
 	</Popover.Content>
 </Popover.Root>

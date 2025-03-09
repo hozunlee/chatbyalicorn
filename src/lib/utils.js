@@ -1,6 +1,7 @@
 import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { cubicOut } from 'svelte/easing'
+import dayjs from 'dayjs'
 
 export function cn(...inputs) {
 	return twMerge(clsx(inputs))
@@ -122,4 +123,26 @@ export function formatTimeAgo(date) {
 
 	// 모든 단위를 벗어나면 (거의 발생하지 않음)
 	return formatter.format(Math.round(-duration), 'years')
+}
+
+/**
+ * 주어진 날짜를 포맷하여 반환
+ *
+ * - 오늘인 경우: 'hh:mm A' 형식으로 시간 반환.
+ * - 그 외의 경우: 'YYYY-MM-DD' 형식으로 날짜 반환.
+ *
+ * @param {string | Date} date - 포맷팅할 날짜.
+ * @returns {string} 포맷팅된 날짜 문자열.
+ */
+export function formatDate(date) {
+	const dayjsDate = dayjs(date)
+	const today = dayjs()
+
+	if (dayjsDate.isSame(today, 'day')) {
+		// 오늘인 경우 시간 반환
+		return dayjsDate.format('hh:mm A')
+	} else {
+		// 그 외 날짜 형식 반환
+		return dayjsDate.format('YYYY-MM-DD')
+	}
 }

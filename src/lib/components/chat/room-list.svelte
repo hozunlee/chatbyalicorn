@@ -1,10 +1,9 @@
 <script>
 	import AvatarLogo from '$lib/components/ui/avatar/AvatarLogo.svelte'
-	import { formatTimeAgo } from '$lib/utils.js'
+	import { formatDate } from '$lib/utils.js'
 	import { cn } from '$lib/utils.js'
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js'
 	import { socket } from '$lib/socket_client'
-	import { onMount } from 'svelte'
 
 	let { items } = $props()
 </script>
@@ -34,7 +33,7 @@
 								// $mailStore.selected === item.id ? 'text-foreground' : 'text-muted-foreground'
 							)}
 						>
-							{formatTimeAgo(new Date(item.lastMessage.createdAt))}
+							{item.lastMessage ? formatDate(new Date(item.lastMessage.createdAt)) : ''}
 						</div>
 					</div>
 					<!-- <div class="text-xs font-medium">{item.subject}</div> -->

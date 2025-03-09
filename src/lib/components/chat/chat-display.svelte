@@ -12,13 +12,24 @@
 	import { onMount } from 'svelte'
 	import { dev } from '$app/environment'
 
-	onMount(() => {
-		if (socket.isConnected) {
-			socket.on('new_message', handleNewMessage)
+	let { roomInfo } = $props()
+
+	// 메시지 컨테이너 요소에 대한 참조 추가
+	let messageContainer = $state()
+
+	// 메시지 목록이나 선택된 채팅방이 변경될 때마다 스크롤 이동
+	$effect(() => {
+		if (messageList.length > 0) {
+			setTimeout(scrollToBottom, 100)
 		}
 	})
 
-	let { roomInfo } = $props()
+	// 스크롤을 맨 아래로 이동하는 함수
+	function scrollToBottom() {
+		if (messageContainer) {
+			messageContainer.scrollTop = messageContainer.scrollHeight
+		}
+	}
 
 	const { partner, messages, id: roomId } = roomInfo
 
@@ -27,52 +38,52 @@
 
 	// 메시지 전송
 	function sendMessage() {
-		// if (!newMessage.trim() || !roomId) return
+		if (!newMessage.trim() || !roomId) return
 
 		const messageData = {
 			roomId: roomId,
 			content: newMessage.trim(),
 			timestamp: new Date().toISOString()
 		}
-
-		// // 낙관적 UI 업데이트 (전송 중 메시지 표시)
-		// const tempId = `temp_${Date.now()}`
-		// const tempMessage = {
-		// 	id: tempId,
-		// 	content: newMessage.trim(),
-		// 	createdAt: new Date().toISOString(),
-		// 	senderId: 1,
-		// 	isMyMessage: true,
-		// 	status: 'sending',
-		// 	roomId: roomId // roomId 추가
-		// }
-
-		// messageList = [...messageList, tempMessage]
 		newMessage = ''
 		// 소켓을 통해 메시지 전송
 		socket.emit('send_message', messageData, () => {})
 	}
 
-	// 새 메시지 처리
-	function handleNewMessage(newMsg) {
-		// if (dev) console.log('🚀 chat-display ~ 새로 받은 메세지:', newMsg)
+	/**
+	 * 메시지 객체를 나타냅니다.
+	 *
+	 * @typedef {Object} Message
+	 * @property {string} id - 메시지의 고유 식별자.
+	 * @property {string} content - 메시지 내용.
+	 * @property {string} createdAt - 메시지 생성 시각 (ISO 8601 형식).
+	 * @property {number} senderId - 메시지를 보낸 사용자의 식별자.
+	 * @property {string} roomId - 메시지가 속한 방의 식별자.
+	 * @property {boolean} isMyMessage - 해당 메시지가 나의 메시지인지 여부.
+	 */
 
-		// 받은 메시지의 roomId와 현재 방의 roomId가 같은 경우에만 처리
+	/**
+	 * 새로운 메시지를 처리합니다.
+	 *
+	 * @param {Message} newMsg
+	 * @returns {void}
+	 */
+	function handleNewMessage(newMsg) {
 		if (newMsg.roomId === roomId) {
 			// 내 메세지 인지 상대 메세지인지 확인
 			newMsg.isMyMessage = newMsg.senderId !== partner.id
 
 			messageList = [...messageList, newMsg]
+
+			setTimeout(scrollToBottom, 100)
 		}
 	}
 
-	function handleKeyDown(e) {
-		// Shift + Enter는 줄바꿈, Enter는 전송
-		if (e.key === 'Enter' && !e.shiftKey) {
-			e.preventDefault()
-			sendMessage()
+	onMount(() => {
+		if (socket.isConnected) {
+			socket.on('new_message', handleNewMessage)
 		}
-	}
+	})
 </script>
 
 <div class="flex h-full flex-col">
@@ -89,7 +100,10 @@
 			</div>
 			<Separator />
 
-			<div class="flex-1 overflow-y-auto p-4 text-sm whitespace-pre-wrap">
+			<div
+				class="flex-1 overflow-y-auto p-4 text-sm whitespace-pre-wrap"
+				bind:this={messageContainer}
+			>
 				{#if messageList.length > 0}
 					<ChatList {messageList} />
 				{/if}

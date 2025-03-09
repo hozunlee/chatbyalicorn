@@ -47,7 +47,7 @@
 			roomId: roomId // roomId 추가
 		}
 
-		messageList = [...messages, tempMessage]
+		messageList = [...messageList, tempMessage]
 		newMessage = ''
 
 		// 소켓을 통해 메시지 전송
@@ -89,7 +89,9 @@
 			<Separator />
 
 			<div class="flex-1 overflow-y-auto p-4 text-sm whitespace-pre-wrap">
-				<ChatList {messageList} />
+				{#if messageList.length > 0}
+					<ChatList {messageList} />
+				{/if}
 			</div>
 			<Separator class="mt-auto" />
 			<!-- 메시지 입력 영역 -->

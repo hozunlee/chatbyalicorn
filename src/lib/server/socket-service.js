@@ -202,7 +202,7 @@ function setupSocketHandlers(io) {
 					},
 					// 최근 메시지 조회
 					messages: {
-						orderBy: { createdAt: 'desc' },
+						orderBy: { createdAt: 'asc' },
 						select: {
 							id: true,
 							content: true,

@@ -1,7 +1,5 @@
 import { writable } from 'svelte/store'
-import { selectedChatRoom } from './store'
 import { io } from 'socket.io-client'
-import { connectedSocket } from './store.js'
 
 /**
  * @typedef {Object} SocketOptions
@@ -70,7 +68,6 @@ class SocketWrapper {
 			this.#socket.on('connect', () => {
 				console.log('Connected with ID:', this.#socket.id)
 				this.#isConnected?.set(true) // 연결 상태 업데이트
-				connectedSocket.set(true)
 			})
 
 			this.#socket.on('disconnect', () => {
@@ -103,9 +100,9 @@ class SocketWrapper {
 		// 채팅방 참여 요청 이벤트 전송
 		this.#socket?.emit('join_room', targetUserId)
 
-		this.#socket?.on('room_joined', (roomInfo) => {
-			selectedChatRoom.set(roomInfo)
-		})
+		// this.#socket?.on('room_joined', (roomInfo) => {
+		// selectedChatRoom.set(roomInfo)
+		// })
 	}
 
 	/**

@@ -12,7 +12,6 @@
 <ScrollArea class="h-screen">
 	<div class="flex flex-col gap-2 p-4 pt-0">
 		{#each items as item}
-			<!-- 채팅방 연결 on:click 추가 -->
 			<button
 				onclick={() => socket.join(Number(item.partner.id))}
 				class={cn(

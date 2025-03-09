@@ -9,20 +9,20 @@
 	import * as Tabs from '$lib/components/ui/tabs/index.js'
 	import ChatDisplay from '$lib/components/chat/chat-display.svelte'
 
-	import { connectedSocket, userName } from '$lib/store.js'
-	console.log('🚀 ~ connectedSocket:', $connectedSocket)
+	import { userName } from '$lib/store.js'
 
 	import { Button } from '$lib/components/ui/button'
 	import Combobox from '$lib/components/ui/combobox/combobox.svelte'
 	import { socket } from '$lib/socket_client'
-	import { onDestroy, onMount } from 'svelte'
+	import { onMount } from 'svelte'
 	import { dev } from '$app/environment'
-	import { on } from 'svelte/events'
 
 	let { rooms, userList } = $props()
 
 	let isNewChat = $state(false)
 	let isConnected = $state(false)
+	let roomList = $state(rooms)
+	console.log('🚀 ~ roomList:', $state.snapshot(roomList))
 
 	let selectedRoomInfo = $state([])
 
@@ -30,14 +30,22 @@
 		const unsubscribe = socket.isConnected.subscribe((connected) => {
 			isConnected = connected
 		})
+
+		return () => unsubscribe()
 	})
 
 	$effect(() => {
 		if (isConnected) {
-			console.log('연결됨')
 			const messageUnsubscribe = socket.on('room_joined', (roomData) => {
 				if (dev) console.log('선택된 채팅방 정보 수신', roomData)
 				selectedRoomInfo = roomData
+			})
+
+			// newMessage를 받게 되면 해당 방의 room lastMessage update
+			socket.on('new_message', (roomData) => {
+				if (dev) console.log('update_room_last', roomData)
+
+				//FIXME : roomList의 lastMessage 업데이트
 			})
 
 			return () => messageUnsubscribe()
@@ -103,7 +111,7 @@
 						</form>
 					</div>
 					<Tabs.Content value="all" class="m-0">
-						<RoomList items={rooms} />
+						<RoomList items={roomList} />
 					</Tabs.Content>
 					<!-- <Tabs.Content value="unread" class="m-0">
 					<RoomList items={chatList.filter((item) => !item.read)} />

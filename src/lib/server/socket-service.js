@@ -271,7 +271,7 @@ function setupSocketHandlers(io) {
 			const savedMessage = await sendMessage(userId, data.roomId, data.content)
 
 			if (savedMessage.id) {
-				socket.to(data.roomId).emit('new_message', savedMessage)
+				io.to(data.roomId).emit('new_message', savedMessage)
 			}
 		})
 
@@ -292,7 +292,6 @@ async function sendMessage(userId, roomId, content) {
 	}
 	// 수신자 ID 결정
 	const recipientId = room.user1Id === userId ? room.user2Id : room.user1Id
-	console.log('🚀 ~ sendMessage ~ recipientId:', recipientId)
 
 	// 메시지 생성
 	const message = await prisma.message.create({
@@ -327,8 +326,7 @@ async function sendMessage(userId, roomId, content) {
 	// isMyMessage 추가
 	const savedMessage = {
 		...message,
-		roomId,
-		isMyMessage: userId === recipientId
+		roomId
 	}
 
 	return savedMessage

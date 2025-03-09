@@ -96,7 +96,7 @@ class SocketWrapper {
 	 * @param {Number} targetUserId - 상대 유저 ID
 	 */
 	join(targetUserId) {
-		console.log('🚀 ~ SocketWrapper ~ createRoom ~ targetUserId:', targetUserId)
+		console.log('🚀 ~ ROOM:JOIN 상대 ID:', targetUserId)
 		if (!targetUserId) {
 			return { status: 'fail', message: '대화 상대 ID가 필요합니다' }
 		}
@@ -104,7 +104,6 @@ class SocketWrapper {
 		this.#socket?.emit('join_room', targetUserId)
 
 		this.#socket?.on('room_joined', (roomInfo) => {
-			console.log('🚀 ~ SocketWrapper ~ this.#socket?.on ~ roomInfo:', roomInfo)
 			selectedChatRoom.set(roomInfo)
 		})
 	}

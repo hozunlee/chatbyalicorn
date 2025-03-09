@@ -7,24 +7,6 @@
 	import { onMount } from 'svelte'
 
 	let { items } = $props()
-
-	onMount(() => {
-		if (socket.isConnected) {
-			socket.on('채팅방 실시간', () => {
-				console.log('채팅방 실시간')
-			})
-		}
-		return () => {
-			// socket.off('new_message', handleNewMessage)
-		}
-	})
-
-	$effect(() => {
-		if (socket.isConnected) {
-			console.log('hello')
-			socket.emit('채팅방 목록 요청')
-		}
-	})
 </script>
 
 <ScrollArea class="h-screen">

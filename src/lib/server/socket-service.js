@@ -268,11 +268,10 @@ function setupSocketHandlers(io) {
 		socket.on('send_message', async (data) => {
 			console.log('메시지 수신:', data)
 
-			const sentMessage = await sendMessage(userId, data.roomId, userId, data.content)
-			console.log('🚀 ~ socket.on ~ sentMessage:', sentMessage)
+			const savedMessage = await sendMessage(userId, data.roomId, data.content)
 
-			if (sentMessage.id) {
-				socket.to(data.roomId).emit('new_message', sentMessage)
+			if (savedMessage.id) {
+				socket.to(data.roomId).emit('new_message', savedMessage)
 			}
 		})
 
@@ -284,7 +283,7 @@ function setupSocketHandlers(io) {
 }
 
 // 메시지 전송
-async function sendMessage(userId, roomId, senderId, content) {
+async function sendMessage(userId, roomId, content) {
 	// 채팅방 정보 조회
 	const room = await prisma.chatRoom.findUnique({ where: { id: roomId } })
 
@@ -292,13 +291,14 @@ async function sendMessage(userId, roomId, senderId, content) {
 		throw new Error('채팅방을 찾을 수 없습니다')
 	}
 	// 수신자 ID 결정
-	const recipientId = room.user1Id === senderId ? room.user2Id : room.user1Id
+	const recipientId = room.user1Id === userId ? room.user2Id : room.user1Id
+	console.log('🚀 ~ sendMessage ~ recipientId:', recipientId)
 
 	// 메시지 생성
 	const message = await prisma.message.create({
 		data: {
 			chatRoomId: roomId,
-			senderId,
+			senderId: userId,
 			content,
 			readStatus: 'SENT',
 			// 메시지는 수신자 기준으로만 읽음 상태 관리
@@ -325,6 +325,11 @@ async function sendMessage(userId, roomId, senderId, content) {
 	})
 
 	// isMyMessage 추가
-	const savedMessage = { ...message, isMyMessage: message.senderId === userId }
+	const savedMessage = {
+		...message,
+		roomId,
+		isMyMessage: userId === recipientId
+	}
+
 	return savedMessage
 }

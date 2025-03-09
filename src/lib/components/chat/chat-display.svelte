@@ -10,6 +10,13 @@
 	import ChatList from './chat-list.svelte'
 
 	import { onMount } from 'svelte'
+	import { dev } from '$app/environment'
+
+	onMount(() => {
+		if (socket.isConnected) {
+			socket.on('new_message', handleNewMessage)
+		}
+	})
 
 	let { roomInfo } = $props()
 
@@ -48,8 +55,14 @@
 	}
 
 	// 새 메시지 처리
-	function handleNewMessage(data) {
-		console.log('🚀 ~ handleNewMessage ~ data:', data)
+	function handleNewMessage(newMsg) {
+		if (dev) console.log('🚀 chat-display ~ 새로 받은 메세지:', newMsg)
+
+		console.log(newMsg.roomId, roomId)
+		// 받은 메시지의 roomId와 현재 방의 roomId가 같은 경우에만 처리
+		if (newMsg.roomId === roomId) {
+			messageList = [...messageList, newMsg]
+		}
 	}
 
 	function handleKeyDown(e) {

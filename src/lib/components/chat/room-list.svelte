@@ -39,7 +39,7 @@
 					<!-- <div class="text-xs font-medium">{item.subject}</div> -->
 				</div>
 				<div class="text-muted-foreground line-clamp-2 text-xs">
-					{item.lastMessage ? item.lastMessage.content.substring(0, 10) : 'No messages yet'}
+					{item.lastMessage ? item.lastMessage.content.substring(0, 50) : 'No messages yet'}
 				</div>
 			</button>
 		{/each}

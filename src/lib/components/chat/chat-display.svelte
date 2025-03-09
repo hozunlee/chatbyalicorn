@@ -10,12 +10,18 @@
 	import ChatList from './chat-list.svelte'
 
 	import { onMount } from 'svelte'
-	import { dev } from '$app/environment'
+	import { Search } from 'lucide-svelte'
 
 	let { roomInfo } = $props()
 
 	// 메시지 컨테이너 요소에 대한 참조 추가
 	let messageContainer = $state()
+
+	// 검색창 표시 여부
+	let showSearch = $state(false)
+
+	// 검색어
+	let searchTerm = $state('')
 
 	// 메시지 목록이나 선택된 채팅방이 변경될 때마다 스크롤 이동
 	$effect(() => {
@@ -79,6 +85,19 @@
 		}
 	}
 
+	// 검색 토글 함수
+	function toggleSearch() {
+		showSearch = !showSearch
+		if (!showSearch) {
+			searchTerm = '' // 검색창을 닫을 때 검색어 초기화
+		} else {
+			// 검색창이 표시되면 포커스 주기
+			setTimeout(() => {
+				document.getElementById('chat-search-input')?.focus()
+			}, 0)
+		}
+	}
+
 	onMount(() => {
 		if (socket.isConnected) {
 			socket.on('new_message', handleNewMessage)
@@ -97,7 +116,31 @@
 						<div class="font-semibold">{partner.name}</div>
 					</div>
 				</div>
+
+				<!-- 검색 버튼 추가 -->
+				<Button variant="ghost" size="icon" on:click={toggleSearch} class="ml-auto">
+					<Search class="h-4 w-4" />
+				</Button>
 			</div>
+
+			<!-- 검색창 영역 (토글 가능) -->
+			{#if showSearch}
+				<div class="bg-muted/30 sticky top-0 z-10 px-4 py-2">
+					<div class="relative">
+						<Search
+							class="text-muted-foreground absolute top-[50%] left-3 h-4 w-4 translate-y-[-50%]"
+						/>
+						<Input
+							id="chat-search-input"
+							type="text"
+							placeholder="채팅 내용 검색..."
+							class="pl-10"
+							bind:value={searchTerm}
+						/>
+					</div>
+				</div>
+			{/if}
+
 			<Separator />
 
 			<div
@@ -105,7 +148,7 @@
 				bind:this={messageContainer}
 			>
 				{#if messageList.length > 0}
-					<ChatList {messageList} />
+					<ChatList {messageList} {searchTerm} />
 				{/if}
 			</div>
 			<Separator class="mt-auto" />

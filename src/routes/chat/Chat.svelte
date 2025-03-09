@@ -22,6 +22,8 @@
 
 	let isNewChat = $state(false)
 	let isConnected = $state(false)
+
+	/* @type {ChatRoomItem[]} */
 	let roomList = $state(rooms)
 
 	/**
@@ -69,7 +71,10 @@
 			isConnected = connected
 		})
 
-		return () => unsubscribe()
+		return () => {
+			unsubscribe()
+			socket.off('new_message')
+		}
 	})
 
 	$effect(() => {
@@ -79,8 +84,6 @@
 				selectedRoomInfo = roomData
 			})
 
-			// newMessage를 받게 되면 해당 방의 room lastMessage update
-			/** @param newMsg {object} */
 			socket.on('new_message', (newMsg) => {
 				if (dev) console.log('update_room_last', newMsg)
 
@@ -164,7 +167,7 @@
 		<p>잠시만 기다려주세요.</p>
 	</div>
 {:else}
-	<div class="h-vh-100 hidden md:block">
+	<div class="h-vh-100 md:block">
 		<Resizable.PaneGroup
 			direction="horizontal"
 			{onLayoutChange}
@@ -202,12 +205,12 @@
 									<Combobox {userList} onSelect={isNewChatHandler} />
 								{/if}
 							</section>
-							<div class="relative">
+							<!-- <div class="relative">
 								<Search
 									class="text-muted-foreground absolute top-[50%] left-2 h-4 w-4 translate-y-[-50%]"
 								/>
 								<Input placeholder="Search" class="pl-8" />
-							</div>
+							</div> -->
 						</form>
 					</div>
 					<Tabs.Content value="all" class="m-0">

@@ -120,7 +120,7 @@ class SocketWrapper {
 	 * 이벤트 리스너를 등록합니다
 	 *
 	 * @param {string} event - 이벤트 이름
-	 * @param {() => void} callback - 콜백 함수
+	 * @param {any} callback - 콜백 함수
 	 * @returns {Function} 리스너 해제 함수
 	 */
 	on(event, callback) {

@@ -59,20 +59,16 @@ model ChatRoom {
 }
 
 model Message {
-  id         String @id @default(uuid())
-  content    String @db.Text
+  id         String   @id @default(uuid())
+  content    String   @db.Text
   chatRoomId String
+  senderId   Int
+  createdAt  DateTime @default(now())
 
-  senderId Int
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // 각 사용자별 읽음 상태
-  isReadByUser1 Boolean   @default(false)
-  isReadByUser2 Boolean   @default(false)
-  readByUser1At DateTime?
-  readByUser2At DateTime?
+  // 읽음 상태 개선
+  readStatus      ReadStatus @default(SENT)
+  readAt          DateTime? // 읽은 시간
+  readByRecipient Boolean    @default(false) // 수신자가 읽었는지 여부
 
   // 관계
   chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
@@ -81,4 +77,11 @@ model Message {
   @@index([chatRoomId])
   @@index([senderId])
   @@index([createdAt])
+  @@index([readStatus])
+}
+
+enum ReadStatus {
+  SENT // 전송됨
+  DELIVERED // 전달됨 (상대방 기기에 도착)
+  READ // 읽음
 }

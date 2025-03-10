@@ -6,7 +6,7 @@ export async function load({ locals }) {
 	try {
 		const currentUser = locals.user
 
-		if (!currentUser.id) {
+		if (!currentUser?.id) {
 			console.error('사용자 정보 없음')
 			redirect(302, '/auth/login')
 		}
@@ -78,9 +78,9 @@ export async function load({ locals }) {
 					name: otherUser.name,
 					profileImage: otherUser.profileImage
 				},
-				lastMessage: room.messages[0] || null,
-				updatedAt: room.updatedAt,
-				unreadCount: 0 // 추후에 구현
+				lastMessage: room.messages[0] || null
+				// updatedAt: room.updatedAt,
+				// unreadCount: 0 // 추후에 구현
 			}
 		})
 

@@ -61,8 +61,8 @@
 	 * @property {number} [unreadCount] - 읽지 않은 메시지 수
 	 */
 
-	/** @type {ChatRoomItem} | {} */
-	let selectedRoomInfo = $state({})
+	/** @type {ChatRoomItem | null} } */
+	let selectedRoomInfo = $state(null)
 
 	$effect(() => {
 		if (isConnected) {
@@ -162,6 +162,12 @@
 		if (socket.isConnected.subscribe) {
 			const unsubscribe = socket.isConnected.subscribe((connected) => {
 				isConnected = connected
+
+				// 모든 채팅방을 join 한다.
+				if (connected && roomList.length > 0) {
+					// 모든 방의 ID를 배열로 추출하여 join
+					socket.joinAllRooms()
+				}
 			})
 
 			return () => {

@@ -170,6 +170,21 @@ function setupSocketHandlers(io) {
 		const { id: userId, name: userName } = socket.data.user
 		console.log(`사용자 연결됨: ${userName || '알 수 없음'} (${socket.id})`)
 
+		socket.on('join_all_rooms', async (callback) => {
+			// userId로 채팅방 목록 조회
+			const rooms = await prisma.chatRoom.findMany({
+				where: {
+					OR: [{ user1Id: userId }, { user2Id: userId }]
+				}
+			})
+
+			// 채팅방 목록을 순회하며 연결
+			rooms.forEach((room) => {
+				socket.join(room.id)
+			})
+			callback(rooms.length)
+		})
+
 		// 채팅방 연결
 		// 채팅방이 있을 시 기존 채팅방으로 연결, 없을 시 새로운 채팅방 생성
 		socket.on('join_room', async (targetUserId) => {

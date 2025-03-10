@@ -88,6 +88,21 @@ class SocketWrapper {
 	}
 
 	/**
+	 * 채팅방 초기 연결 시 모든 채팅방을 연결한다.
+	 *
+	 * @returns
+	 */
+	joinAllRooms() {
+		if (!this.#socket) {
+			console.warn('Socket not initialized. Call connect() first.')
+			return () => {}
+		}
+		this.#socket.emit('join_all_rooms', (rooms) => {
+			console.log('🚀 ~ ROOM:JOIN_ALL_ROOMS ~ rooms', rooms)
+		})
+	}
+
+	/**
 	 * 채팅방을 참여하는 메서드 하지만 채팅방이 없으면 채팅방을 생성요청한다. 기존 채팅방이 있으면, 기존 채팅방 ID를 전달해준다.
 	 *
 	 * @param {Number} targetUserId - 상대 유저 ID

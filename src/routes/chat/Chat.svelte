@@ -157,6 +157,22 @@
 		}
 	}
 
+	// 모바일
+
+	// 모바일 화면에서 채팅방 표시 여부
+	let showMobileChat = $state(false)
+
+	// 모바일에서 채팅방 선택 핸들러
+	const handleMobileRoomSelect = (room) => {
+		// selectedRoomInfo = room
+		showMobileChat = true
+	}
+
+	// 모바일 채팅방에서 뒤로 가기
+	const goBackToRoomList = () => {
+		showMobileChat = false
+	}
+
 	onMount(() => {
 		// 소켓 연결 상태를 감지하여 렌더링 결정
 		if (socket.isConnected.subscribe) {
@@ -170,9 +186,20 @@
 				}
 			})
 
+			// 화면 크기 변경 감지
+			const handleResize = () => {
+				// md 이상 크기일 때 모바일 뷰 상태 리셋
+				if (window.innerWidth >= 768) {
+					showMobileChat = false
+				}
+			}
+
+			window.addEventListener('resize', handleResize)
+
 			return () => {
 				unsubscribe()
 				socket.off('new_message')
+				window.removeEventListener('resize', handleResize)
 			}
 		}
 	})
@@ -250,5 +277,89 @@
 				{/if}
 			</Resizable.Pane>
 		</Resizable.PaneGroup>
+	</div>
+
+	<!-- 모바일 레이아웃 (md 미만) -->
+	<div class="flex h-screen flex-col md:hidden">
+		<!-- 모바일에서 채팅방 목록 표시 -->
+		{#if !showMobileChat}
+			<div class="flex h-full flex-col">
+				<div class="flex items-center justify-between border-b px-4 py-3">
+					<h1 class="text-xl font-bold">Alicorn-Chat ({$userName})</h1>
+					<Button variant="ghost" size="sm" on:click={logoutHandler} class="text-xs">
+						로그아웃
+					</Button>
+				</div>
+
+				<div class="bg-background border-b p-3">
+					<section class="flex py-2">
+						<Button on:click={isNewChatHandler} class="w-full">새로운 채팅</Button>
+					</section>
+					{#if isNewChat}
+						<div class="mt-2">
+							<Combobox {userList} onSelectIsOpen={isNewChatHandler} />
+						</div>
+					{/if}
+				</div>
+
+				<!-- 모바일용 채팅방 목록 -->
+				<div class="flex-1 overflow-y-auto">
+					<div class="divide-y">
+						{#each roomList as room (room.id)}
+							<button
+								class="hover:bg-muted/50 flex w-full items-start px-4 py-3 transition-colors"
+								onclick={() => handleMobileRoomSelect()}
+							>
+								<!-- 채팅방 목록 아이템 내용 -->
+								<div class="min-w-0 flex-1">
+									<RoomList items={roomList} />
+								</div></button
+							>
+						{:else}
+							<div class="p-8 text-center text-muted-foreground">대화 목록이 없습니다</div>
+						{/each}
+					</div>
+				</div>
+			</div>
+			<!-- 모바일에서 채팅방 표시 -->
+		{:else if showMobileChat}
+			<div class="flex h-full flex-col">
+				<!-- 모바일 채팅방 헤더 -->
+				<div class="bg-background flex items-center border-b px-2 py-3">
+					<Button variant="ghost" size="icon" on:click={goBackToRoomList} class="mr-2">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-chevron-left"
+						>
+							<path d="m15 18-6-6 6-6" />
+						</svg>
+						<span class="sr-only">뒤로가기</span>
+					</Button>
+
+					<!-- <div class="flex-1">
+						<h3 class="truncate font-medium">
+							{selectedRoomInfo.partner?.name}
+						</h3>
+					</div> -->
+				</div>
+
+				<!-- 모바일 채팅 내용 -->
+				<div class="flex-1 overflow-hidden">
+					{#if selectedRoomInfo && selectedRoomInfo?.id}
+						{#key selectedRoomInfo.id}
+							<ChatDisplay roomInfo={selectedRoomInfo} />
+						{/key}
+					{/if}
+				</div>
+			</div>
+		{/if}
 	</div>
 {/if}

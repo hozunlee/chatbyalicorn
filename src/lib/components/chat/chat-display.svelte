@@ -12,7 +12,8 @@
 	import { onMount } from 'svelte'
 	import { Search } from 'lucide-svelte'
 
-	let { roomInfo } = $props()
+	let { roomInfo, isMobile = false } = $props()
+	console.log('🚀 ~ roomInfo:', roomInfo)
 
 	// 메시지 컨테이너 요소에 대한 참조 추가
 	let messageContainer = $state()

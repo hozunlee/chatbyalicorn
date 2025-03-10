@@ -139,6 +139,7 @@ Socket.IO 클라이언트 래퍼 클래스
 > 초기 데이터 불러오기 / routeing
 > vercel의 경우 serveress 기반으로 특정 시간이 지나면 인스턴스가 멈추므로 해당 웹 서비스를 배포하긴 어려움이 있고, nodejs 기반 render를 사용하면 배포 할 수 있는 방법이 있습니다.
 > 다른 방법으론 socketIO를 걷어내고 supabase realtime을 이용하는 방법이 있을 것 같습니다.
+> 임의 URL의 도메인의 경우는 가지고 있는 도메인에 chat.hololog.dev 처럼 서브 도메인 부여 예정입니다.
 
 
 

@@ -8,7 +8,7 @@ SvelteKit 기반의 실시간 채팅 시스템 구현
 
 ## 기술스택
 
-프레임워크 : svelteKit( 풀스택 )
+프레임워크 : svelteKit
 
 실시간 통신 : Socket.IO
 

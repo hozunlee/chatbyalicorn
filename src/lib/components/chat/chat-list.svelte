@@ -1,9 +1,24 @@
 <script>
 	import { formatDate } from '$lib/utils'
 
-	const { messageList, searchTerm = '' } = $props()
+	/**
+	 * @typedef {{
+	 * 	content: string
+	 * 	createdAt: string
+	 * 	isMyMessage: boolean
+	 * 	senderId: number
+	 * 	id: string
+	 * }} message
+	 */
 
-	// 검색 결과 하이라이트 함수
+	/**
+	 * @typedef {{
+	 * 	messageList: message[]
+	 * 	searchTerm: string
+	 * }} Props
+	 */
+	/** @type {Props} */
+	const { messageList, searchTerm = '' } = $props()
 
 	/**
 	 * 텍스트 내에서 검색어를 강조 표시

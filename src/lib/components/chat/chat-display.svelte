@@ -1,19 +1,16 @@
 <script>
-	import AvatarLogo from '$lib/components/ui/avatar/AvatarLogo.svelte'
-
-	import { Button } from '$lib/components/ui/button/index.js'
-
-	import { Separator } from '$lib/components/ui/separator/index.js'
-
-	import Input from '$lib/components/ui/input/input.svelte'
+	import { onMount } from 'svelte'
 	import { socket } from '$lib/socket_client'
+
+	import { Search } from 'lucide-svelte'
+	import AvatarLogo from '$lib/components/ui/avatar/AvatarLogo.svelte'
+	import { Button } from '$lib/components/ui/button/index.js'
+	import { Separator } from '$lib/components/ui/separator/index.js'
+	import Input from '$lib/components/ui/input/input.svelte'
+
 	import ChatList from './chat-list.svelte'
 
-	import { onMount } from 'svelte'
-	import { Search } from 'lucide-svelte'
-
 	let { roomInfo, isMobile = false } = $props()
-	console.log('🚀 ~ roomInfo:', roomInfo)
 
 	// 메시지 컨테이너 요소에 대한 참조 추가
 	let messageContainer = $state()

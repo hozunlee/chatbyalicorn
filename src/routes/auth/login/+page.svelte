@@ -3,9 +3,9 @@
 </script>
 
 <div
-	class="relative container h-[800px] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0"
+	class="relative container grid h-[800px] flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0"
 >
-	<div class="bg-muted relative h-full flex-col p-10 text-white lg:flex dark:border-r">
+	<div class="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r">
 		<!-- <div
 	class="absolute inset-0 bg-cover"
 	style="
@@ -22,9 +22,9 @@
 			</blockquote>
 		</div>
 	</div>
-	<div class="lg:p-8">
+	<div class=" lg:p-8">
 		<div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-			<div class="flex flex-col space-y-2 text-center">
+			<div class="mt-10 flex flex-col space-y-2 text-center">
 				<div class="text-2xl lg:text-3xl">본격!</div>
 				<h1 class="scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-3xl">
 					알리콘을 위한 대화방

@@ -98,6 +98,49 @@ Socket.IO 클라이언트 래퍼 클래스
 <img width="669" alt="image" src="https://github.com/user-attachments/assets/41a054e1-f220-477b-a198-25f68605068f" />
 
 
+## 추가기능
+
+ - [x] 로그인, 로그아웃을 할 수 있습니다.
+> google oAuth2 로 로그인 / 로그아웃 구현
+> sessionId를 cookies에 담아 내부적으로 검증 시스템 마련
+![loginout](https://github.com/user-attachments/assets/65715cf3-718b-4ae9-a3cb-c855b12e0d78)
+- [x] 비 로그인 사용자 접속 시 로그인을 유도 합니다.
+> 비 로그인시 / 접속하여도 sessionId 확인 후 server.hooks 에서 /auth/login으로 redirect
+> 로그인 기반 시스템이기 때문에 강제함
+- [x] `새 메시지` 버튼 클릭 후 새 대화방 생성 시 대화 상대 검색이 가능합니다.
+![usersearch](https://github.com/user-attachments/assets/cf07b91c-aec3-43b6-a075-f5fc37187d4b)
+
+- 대화에 URL이 있는 경우 Clickable하게(실제로 동작) 출력합니다.
+> @html 기능을 사용하여 content(대화내용) 의 https:// 를 정규표현식으로 찾은 뒤 <a> tag 로 변환
+![linked](https://github.com/user-attachments/assets/ef5d4bc8-8d70-4415-9e68-91bba55f5bf8)
+
+
+- [x] 대화를 검색할 수 있습니다.
+> 대화를 검색하여 하이라이트 처리와 검색 갯수 표시
+> 대화로 스크롤링 하는 것은 개선 필요
+![search](https://github.com/user-attachments/assets/e3133b89-e857-4a44-898a-a519552d7f10)
+
+## 개선필요 기능
+- Responsive를 지원합니다.
+> 예시 이미지를 생각하고 desktop 화면부터 구성하여 mobile 화면은 별도 구현
+> mobile first로 구현하고 desktop을 확장해나갔어야 하는 아쉬움이 있습니다.
+> responsive하게 리팩토링 필요
+- 읽지 않은 메시지가 있는 경우 화면상 표기를 다르게 합니다.
+> 스키마 구조 변경이 필요하여 isRead를 활용해야할 듯 합니다.
+> 현재 1개의 채팅방에 담긴 message를 공유하는 구조라 어려운 부분이 있습니다.
+> message model을 좀 더 리팩토링해서 읽기에 대한 flag 를 주는 것이 필요할 것 같습니다.
+- 메시지 전송시 상대방에게 Task Queue를 사용하여 메시지 내용을 메일로 전송합니다.
+> 구글 로그인으로 email 주소 확보 / nodemailer를 통해 sendMessage event에 sendMail 함수 추가하면 될 것 같습니다.
+> 자바스크립트 실행 컨텍스트에 즉시 실행하지 않고 task queue에 넣어 비동기로 백그라운드 처리하면 성능 유지에 나은 결과를 가져올 것 같습니다.
+- Production 환경을 구축하여 동작 가능한 임의의 URL로 접속 할 수 있습니다.
+> sveltekit을 활용한다는 점을 고민했을 때 별도의 nodejs server를 구축하지 않을 방법을 고민했습니다.
+> hooks.server.js를 활용해 socket을 init 시키고 싱글톤으로 구현했습니다.
+> 채팅의 경우 svetlekit이 가지고 있는 SSR 기능이 오히려 동기화에 불편함을 가져와 CSR 형식으로 svetlekit의 몇가지 기능만 이용했습니다.
+> 초기 데이터 불러오기 / routeing
+> vercel의 경우 serveress 기반으로 특정 시간이 지나면 인스턴스가 멈추므로 해당 웹 서비스를 배포하긴 어려움이 있고, nodejs 기반 render를 사용하면 배포 할 수 있는 방법이 있습니다.
+> 다른 방법으론 socketIO를 걷어내고 supabase realtime을 이용하는 방법이 있을 것 같습니다.
+
+
 
 ## video demo
 ### desktop

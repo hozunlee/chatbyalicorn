@@ -64,6 +64,9 @@ PNPM dev
 
 ### 서버 사이드
 
+`hooks.server.js`
+server hooks을 이용한 socket 초기화 및 서버 실행
+
 `socket-service.js`
 Socket.IO 서버 설정 및 이벤트 핸들러 관리
 인증 미들웨어 및 채팅방 로직 처리

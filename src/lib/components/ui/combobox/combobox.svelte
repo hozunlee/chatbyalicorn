@@ -9,7 +9,7 @@
 	import { socket } from '$lib/socket_client'
 	import AvatarLogo from '../avatar/AvatarLogo.svelte'
 
-	let { userList, onSelect } = $props()
+	let { userList, onSelectIsOpen } = $props()
 
 	let open = $state(false)
 	let value = $state('')
@@ -47,17 +47,19 @@
 				<Command.Group>
 					{#each userList as user}
 						<Command.Item
-							value={String(user.id)}
+							value={String(user.name)}
 							onSelect={(currentValue) => {
-								value = currentValue
-								socket.join(Number(currentValue))
-								onSelect()
+								value = String(currentValue)
+								socket.join(Number(user.id))
+								onSelectIsOpen()
 								closeAndFocusTrigger(ids.trigger)
 							}}
 						>
 							<AvatarLogo item={user} />
-							<Check class={cn('mr-2 h-4 w-4', value !== String(user.id) && 'text-transparent')} />
-							{user.name}
+							<Check
+								class={cn('mr-2 h-4 w-4', value !== String(user.name) && 'text-transparent')}
+							/>
+							{user.name.trim()}
 						</Command.Item>
 					{/each}
 				</Command.Group>

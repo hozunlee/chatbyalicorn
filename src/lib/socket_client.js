@@ -42,7 +42,7 @@ class SocketWrapper {
 	}
 
 	/**
-	 * 소켓 연결을 초기화합니다
+	 * 소켓 연결을 초기화합니다 FIXME product 시 서버 URL 변경 필요
 	 *
 	 * @param {string} [url='http://localhost:3001'] - 서버 URL. Default is `'http://localhost:3001'`
 	 * @param {SocketOptions} [options={}] - 소켓 설정. Default is `{}`
@@ -66,7 +66,7 @@ class SocketWrapper {
 			// this.#socketStore?.set(this.#socket)
 
 			this.#socket.on('connect', () => {
-				console.log('Connected with ID:', this.#socket.id)
+				console.log('Connected with socket ID:', this.#socket?.id)
 				this.#isConnected?.set(true) // 연결 상태 업데이트
 			})
 

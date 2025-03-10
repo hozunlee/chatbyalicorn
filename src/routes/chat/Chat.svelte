@@ -1,29 +1,27 @@
 <script>
-	import Search from 'lucide-svelte/icons/search'
+	import { onMount } from 'svelte'
+	import { dev } from '$app/environment'
+	import { goto } from '$app/navigation'
+
+	import { userName } from '$lib/store.js'
+	import { socket } from '$lib/socket_client'
+
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle'
 
+	import Combobox from '$lib/components/ui/combobox/combobox.svelte'
 	import RoomList from '$lib/components/chat/room-list.svelte'
-	import { Input } from '$lib/components/ui/input/index.js'
 	import * as Resizable from '$lib/components/ui/resizable/index.js'
 	import { Separator } from '$lib/components/ui/separator'
 	import * as Tabs from '$lib/components/ui/tabs/index.js'
 	import ChatDisplay from '$lib/components/chat/chat-display.svelte'
-
-	import { userName } from '$lib/store.js'
-
 	import { Button } from '$lib/components/ui/button'
-	import Combobox from '$lib/components/ui/combobox/combobox.svelte'
-	import { socket } from '$lib/socket_client'
-	import { onMount } from 'svelte'
-	import { dev } from '$app/environment'
-	import { goto } from '$app/navigation'
 
 	let { rooms, userList } = $props()
 
 	let isNewChat = $state(false)
 	let isConnected = $state(false)
 
-	/* @type {ChatRoomItem[]} */
+	/** @type {ChatRoomItem[]} */
 	let roomList = $state(rooms)
 
 	/**
@@ -63,25 +61,19 @@
 	 * @property {number} [unreadCount] - 읽지 않은 메시지 수
 	 */
 
-	/** @type {ChatRoomItem[]} */
-	let selectedRoomInfo = $state([])
-
-	onMount(() => {
-		const unsubscribe = socket.isConnected.subscribe((connected) => {
-			isConnected = connected
-		})
-
-		return () => {
-			unsubscribe()
-			socket.off('new_message')
-		}
-	})
+	/** @type {ChatRoomItem} | {} */
+	let selectedRoomInfo = $state({})
 
 	$effect(() => {
 		if (isConnected) {
 			const messageUnsubscribe = socket.on('room_joined', (roomData) => {
 				if (dev) console.log('선택된 채팅방 정보 수신', roomData)
 				selectedRoomInfo = roomData
+
+				// 새 채팅방이면 목록에 추가
+				if (roomData && !roomList.some((room) => room.id === roomData.id)) {
+					addRoomToList(roomData)
+				}
 			})
 
 			socket.on('new_message', (newMsg) => {
@@ -93,6 +85,14 @@
 			return () => messageUnsubscribe()
 		}
 	})
+
+	/** @param {ChatRoomItem} room */
+	const addRoomToList = (room) => {
+		// 이미 목록에 있는지 확인
+		if (!roomList.some((existingRoom) => existingRoom.id === room.id)) {
+			roomList = [room, ...roomList]
+		}
+	}
 
 	/**
 	 * 메시지 객체를 나타냅니다.
@@ -156,6 +156,20 @@
 			goto('/auth/login')
 		}
 	}
+
+	onMount(() => {
+		// 소켓 연결 상태를 감지하여 렌더링 결정
+		if (socket.isConnected.subscribe) {
+			const unsubscribe = socket.isConnected.subscribe((connected) => {
+				isConnected = connected
+			})
+
+			return () => {
+				unsubscribe()
+				socket.off('new_message')
+			}
+		}
+	})
 </script>
 
 {#if !isConnected}
@@ -167,7 +181,7 @@
 		<p>잠시만 기다려주세요.</p>
 	</div>
 {:else}
-	<div class="h-vh-100 md:block">
+	<div class="h-vh-100 hidden md:block">
 		<Resizable.PaneGroup
 			direction="horizontal"
 			{onLayoutChange}
@@ -202,7 +216,7 @@
 							<section class="flex py-3">
 								<Button on:click={isNewChatHandler}>새로운 채팅</Button>
 								{#if isNewChat}
-									<Combobox {userList} onSelect={isNewChatHandler} />
+									<Combobox {userList} onSelectIsOpen={isNewChatHandler} />
 								{/if}
 							</section>
 							<!-- <div class="relative">

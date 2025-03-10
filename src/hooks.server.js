@@ -40,7 +40,9 @@ export const handle = async ({ event, resolve }) => {
 			await socketService.initializeStandalone()
 		} else if (event.platform?.server) {
 			console.log('📟 프로덕션 환경에서 소켓 서버 초기화')
+			// render 호스팅 환경에서는 nodejs 기반 이므로 동작 가능
 			await socketService.initialize(event.platform.server)
+			// vercel같은 서버리스 환경에서는 supabase realtime을 사용하여 배포환경 조성
 		}
 	}
 

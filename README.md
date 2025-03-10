@@ -1,17 +1,27 @@
 # 알리콘을 위한 대화방
+<img width="1140" alt="image" src="https://github.com/user-attachments/assets/4c570613-6aa5-48f4-ace4-f6e612a2d14d" />
 
 SvelteKit 기반의 실시간 채팅 시스템 구현
 웹소켓을 통한 실시간 통신을 지원하며 Prisma ORM을 활용하여 데이터베이스를 관리합니다.
 
+
+
 ## 기술스택
 
 프레임워크 : svelteKit( 풀스택 )
+
 실시간 통신 : Socket.IO
+
 스타일링 : shadCN-svelte, tailwind
+
 백엔드 서비스 : Supabase (데이터베이스 및 인증)
+
 ORM : prisma
+
 인증 : google Oauth2
+
 type Check : JSDOC
+
 package manager : PNPM
 
 ## 실행 방법
@@ -30,7 +40,7 @@ PNPM dev
 
 ```
 
-##주요 기능
+## 주요 기능
 
 1. 사용자 인증
    세션 기반 인증 시스템
@@ -83,3 +93,15 @@ Socket.IO 클라이언트 래퍼 클래스
 채팅 메시지 표시 및 입력 인터페이스
 메시지 전송 및 실시간 업데이트
 메시지 검색 기능
+
+## DB schema
+<img width="669" alt="image" src="https://github.com/user-attachments/assets/41a054e1-f220-477b-a198-25f68605068f" />
+
+
+
+## video demo
+### desktop
+![chat2](https://github.com/user-attachments/assets/25444d80-c1b5-42c0-8591-d0536fad1efc)
+
+### mobile
+![mobile](https://github.com/user-attachments/assets/f75e76b0-864f-4092-8630-914a6504db6d)
